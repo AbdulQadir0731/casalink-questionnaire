@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         :root {
             --primary: #0d7377;
@@ -738,6 +739,20 @@
 
         .btn-close-summary:hover { background: #f0fafa; }
 
+        .btn-email {
+            background: linear-gradient(135deg, #06d6a0, #05c493);
+            color: white;
+            border-color: #06d6a0;
+        }
+
+        .btn-email:hover { background: linear-gradient(135deg, #05c493, #04b384); }
+
+        .btn-email:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* ── Toast ── */
         .toast {
             position: fixed;
@@ -946,6 +961,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ── EmailJS Configuration ──
+// To set up: go to https://www.emailjs.com
+// 1. Create free account → 2. Add Gmail service → 3. Create email template → 4. Copy IDs below
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';   // Dashboard → Account → Public Key
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';   // Dashboard → Email Services → Service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // Dashboard → Email Templates → Template ID
+const RECIPIENT_EMAIL = 'abdulqadir0731@gmail.com';
+
+(function() {
+    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
+})();
+
 const SECTION_ICONS = [
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
@@ -1412,6 +1441,7 @@ function showSummary() {
         </div>
         <div class="summary-body">${bodyHtml}</div>
         <div class="summary-actions">
+            <button class="btn-email" id="btnEmail" onclick="sendEmail()">Send via Email</button>
             <button class="btn-copy" onclick="copyToClipboard()">Copy to Clipboard</button>
             <button class="btn-download" onclick="downloadText()">Download as Text</button>
             <button class="btn-close-summary" onclick="closeSummary()">Go Back & Edit</button>
@@ -1440,6 +1470,36 @@ function downloadText() {
     a.download = 'CasaLink-Project-Answers.txt';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function sendEmail() {
+    if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+        showToast('EmailJS not configured yet — see setup instructions');
+        return;
+    }
+    const btn = document.getElementById('btnEmail');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const text = document.getElementById('summaryBox').dataset.plain;
+    const answered = Object.keys(answers).length;
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: RECIPIENT_EMAIL,
+        subject: 'CasaLink Questionnaire — New Submission',
+        message: text,
+        answered_count: answered + ' of ' + totalQuestions,
+        date: new Date().toLocaleString()
+    }).then(function() {
+        btn.textContent = 'Sent!';
+        showToast('Answers sent to your email!');
+        setTimeout(() => { btn.textContent = 'Send via Email'; btn.disabled = false; }, 3000);
+    }, function(error) {
+        btn.textContent = 'Send via Email';
+        btn.disabled = false;
+        showToast('Failed to send — check EmailJS config');
+        console.error('EmailJS error:', error);
+    });
 }
 
 function showToast(msg) {
