@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CasaLink – Project Discovery Questionnaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d7377;
+            --primary-light: #14919b;
+            --primary-dark: #0a5c5f;
+            --accent: #06d6a0;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --text-muted: #6b7280;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── Hero Header ── */
+        .header {
+            position: relative;
+            background: linear-gradient(135deg, #0d7377 0%, #14919b 40%, #06d6a0 100%);
+            color: white;
+            padding: 48px 20px 36px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+            animation: headerShimmer 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes headerShimmer {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(2%, 1%) rotate(1deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 1.05rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* ── Circular Progress ── */
+        .progress-ring-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.2);
+            stroke-width: 5;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 163.36;
+            stroke-dashoffset: 163.36;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .progress-ring-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-align: left;
+        }
+
+        .progress-label strong {
+            display: block;
+            font-size: 1.05rem;
+        }
+
+        /* ── Step Indicator ── */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 20px;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .step-dot {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 100px;
+            border: 2px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .step-dot svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-dot:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .step-dot.completed {
+            background: #e6f7f7;
+            border-color: var(--accent);
+            color: var(--primary-dark);
+        }
+
+        .step-dot.completed svg {
+            color: var(--accent);
+        }
+
+        .step-dot-label {
+            display: none;
+        }
+
+        @media (min-width: 900px) {
+            .step-dot-label { display: inline; }
+        }
+
+        /* ── Main Container ── */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 28px 16px 140px;
+        }
+
+        /* ── Wizard Section ── */
+        .wizard-section {
+            display: none;
+            animation: fadeSlideIn 0.45s ease both;
+        }
+
+        .wizard-section.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeSlideOut {
+            from { opacity: 1; transform: translateY(0); }
+            to   { opacity: 0; transform: translateY(-24px); }
+        }
+
+        .wizard-section.exiting {
+            display: block;
+            animation: fadeSlideOut 0.3s ease both;
+        }
+
+        /* ── Section Header Card ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px;
+            background: white;
+            border-radius: var(--radius) var(--radius) 0 0;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .section-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-icon-wrap svg {
+            width: 26px;
+            height: 26px;
+            color: white;
+        }
+
+        .section-header-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .section-header-text p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .section-auto-btn {
+            margin-left: auto;
+            padding: 8px 16px;
+            border: 2px solid var(--primary-light);
+            border-radius: 100px;
+            background: white;
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .section-auto-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ── Question Card ── */
+        .question-card {
+            background: white;
+            padding: 28px;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            animation: questionEntrance 0.4s ease forwards;
+        }
+
+        .question-card:last-child {
+            border-bottom: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        @keyframes questionEntrance {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card:nth-child(2) { animation-delay: 0.05s; }
+        .question-card:nth-child(3) { animation-delay: 0.10s; }
+        .question-card:nth-child(4) { animation-delay: 0.15s; }
+        .question-card:nth-child(5) { animation-delay: 0.20s; }
+        .question-card:nth-child(6) { animation-delay: 0.25s; }
+        .question-card:nth-child(7) { animation-delay: 0.30s; }
+        .question-card:nth-child(8) { animation-delay: 0.35s; }
+        .question-card:nth-child(9) { animation-delay: 0.40s; }
+
+        .question-card.answered {
+            background: #f8fffe;
+        }
+
+        .question-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .question-card.answered .question-number {
+            background: var(--accent);
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            padding-top: 3px;
+        }
+
+        .multi-note {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        /* ── Option Buttons ── */
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-btn {
+            position: relative;
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: #fafbfc;
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-light);
+            background: #eef9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13,115,119,0.1);
+        }
+
+        .option-btn:active {
+            transform: scale(0.97);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #e0f5f5, #d4f1f1);
+            color: var(--primary-dark);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(13,115,119,0.15);
+        }
+
+        .option-btn.selected::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+            animation: checkPop 0.3s ease;
+        }
+
+        @keyframes checkPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .option-btn.recommended {
+            border-color: var(--primary-light);
+            background: linear-gradient(135deg, #f0fafa, #e8f7f7);
+        }
+
+        .rec-badge {
+            font-size: 0.6rem;
+            background: var(--primary);
+            color: white;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .option-btn.selected.recommended {
+            background: linear-gradient(135deg, #d0f0f0, #c0ebeb);
+        }
+
+        /* ── Recommendation Box (Collapsible) ── */
+        .rec-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .rec-toggle:hover { color: var(--primary-dark); }
+
+        .rec-toggle svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .rec-toggle.open svg {
+            transform: rotate(180deg);
+        }
+
+        .recommendation-box {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease, margin 0.35s ease;
+            padding: 0 16px;
+            margin-top: 0;
+            background: linear-gradient(135deg, #f0fafa, #e8f4f5);
+            border-left: 4px solid var(--primary-light);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.88rem;
+            color: #1a5c5e;
+            line-height: 1.5;
+        }
+
+        .recommendation-box.open {
+            max-height: 200px;
+            padding: 12px 16px;
+            margin-top: 10px;
+        }
+
+        .recommendation-box strong {
+            color: var(--primary);
+        }
+
+        /* ── Text Input ── */
+        .text-input {
+            width: 100%;
+            max-width: 440px;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            background: #fafbfc;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(20,145,155,0.1);
+            background: white;
+        }
+
+        /* ── Navigation Buttons ── */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .nav-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .nav-btn-back {
+            background: white;
+            border-color: var(--border);
+            color: var(--text-muted);
+        }
+
+        .nav-btn-back:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-btn-next {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 15px rgba(13,115,119,0.3);
+        }
+
+        .nav-btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(13,115,119,0.4);
+        }
+
+        .nav-btn-next:active {
+            transform: translateY(0);
+        }
+
+        .nav-btn-finish {
+            background: linear-gradient(135deg, var(--accent), #05c493);
+            color: white;
+            box-shadow: 0 4px 15px rgba(6,214,160,0.3);
+        }
+
+        .nav-btn-finish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(6,214,160,0.4);
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* ── Summary Modal ── */
+        .summary-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 40px 20px;
+            animation: overlayIn 0.3s ease;
+        }
+
+        @keyframes overlayIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .summary-overlay.active {
+            display: block;
+        }
+
+        .summary-box {
+            background: white;
+            max-width: 720px;
+            margin: 0 auto;
+            border-radius: var(--radius);
+            padding: 0;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.4s ease;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .summary-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 28px 32px;
+            color: white;
+            text-align: center;
+        }
+
+        .summary-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .summary-header p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .summary-body {
+            padding: 24px 32px 32px;
+        }
+
+        .summary-section-card {
+            margin-bottom: 20px;
+        }
+
+        .summary-section-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e6f7f7;
+        }
+
+        .summary-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .summary-item:last-child { border-bottom: none; }
+
+        .summary-q {
+            font-weight: 600;
+            color: #333;
+            min-width: 50%;
+            font-size: 0.9rem;
+        }
+
+        .summary-a {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .summary-a.skipped {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .summary-actions {
+            text-align: center;
+            padding: 20px 32px 28px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border);
+        }
+
+        .summary-actions button {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 2px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-copy:hover { background: var(--primary-dark); }
+
+        .btn-download {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+        }
+
+        .btn-download:hover { background: var(--primary); }
+
+        .btn-close-summary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-close-summary:hover { background: #f0fafa; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.35s ease;
+            z-index: 300;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Confetti ── */
+        .confetti-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 250;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ── Mobile Bottom Nav ── */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            z-index: 150;
+            gap: 10px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+
+        .mobile-nav .nav-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* ── Completion Screen ── */
+        .completion-screen {
+            text-align: center;
+            padding: 60px 24px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .completion-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #05c493);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: completionPop 0.6s ease;
+        }
+
+        @keyframes completionPop {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .completion-icon svg {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .completion-screen h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .completion-screen p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .completion-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 15px rgba(13,115,119,0.3);
+            transition: var(--transition);
+        }
+
+        .completion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(13,115,119,0.4);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .header { padding: 36px 16px 28px; }
+            .header h1 { font-size: 1.8rem; }
+            .container { padding: 20px 12px 160px; }
+            .question-card { padding: 22px 18px; }
+            .options { gap: 8px; }
+            .option-btn {
+                padding: 10px 16px;
+                font-size: 0.88rem;
+                width: 100%;
+            }
+            .nav-buttons { display: none; }
+            .mobile-nav { display: flex; }
+            .step-indicator { gap: 4px; padding: 10px 12px; }
+            .step-dot { padding: 6px 10px; font-size: 0.75rem; }
+            .section-header { flex-wrap: wrap; padding: 20px 18px; }
+            .section-auto-btn { margin-left: 0; margin-top: 8px; width: 100%; text-align: center; }
+            .summary-body { padding: 16px 18px 24px; }
+            .summary-header { padding: 20px 18px; }
+            .summary-actions { padding: 16px 18px 20px; }
+            .summary-actions button { width: 100%; }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <h1>CasaLink</h1>
+        <p>Project Discovery Questionnaire</p>
+        <div class="progress-ring-wrap">
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="64" height="64" viewBox="0 0 64 64">
+                    <circle class="progress-ring-bg" cx="32" cy="32" r="26"/>
+                    <circle class="progress-ring-fill" id="progressRing" cx="32" cy="32" r="26"/>
+                </svg>
+                <div class="progress-ring-text" id="progressPct">0%</div>
+            </div>
+            <div class="progress-label">
+                <strong id="progressCount">0 of 43</strong>
+                questions answered
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="step-indicator" id="stepIndicator"></div>
+
+<div class="container" id="formContainer"></div>
+
+<div class="mobile-nav" id="mobileNav">
+    <button class="nav-btn nav-btn-back" id="mobileBack" onclick="navigate(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+    </button>
+    <button class="nav-btn nav-btn-next" id="mobileNext" onclick="navigate(1)">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+</div>
+
+<div class="summary-overlay" id="summaryOverlay">
+    <div class="summary-box" id="summaryBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SECTION_ICONS = [
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`
+];
+
+const SECTION_DESCRIPTIONS = [
+    "App name, branding, target market & audience",
+    "Pricing, payments, cancellations & rental types",
+    "Verification, listings, calendar & payouts",
+    "Login, search, booking & wishlists",
+    "Price comparison, alerts & deal recommendations",
+    "Reviews, ratings & verified badges",
+    "Real-time chat, file sharing & notifications",
+    "Approvals, commissions, bans & analytics"
+];
+
+const questionnaire = [
+    {
+        section: "Basic Information",
+        icon: "1",
+        questions: [
+            { id: "q1", text: "What is the final app name?", type: "text", placeholder: "CasaLink", rec: "We recommend keeping <strong>CasaLink</strong> — it's short, memorable, easy to spell, and clearly communicates the concept of home (Casa) + connection (Link)." },
+            { id: "q2", text: "Do you have a logo ready?", options: ["Yes, ready", "No, need to design"], recommended: 0, rec: "<strong>Having a logo ready</strong> saves time and ensures brand consistency from day one. If not ready, we'll design one as part of the branding phase." },
+            { id: "q3", text: "Do you have brand colors selected?", options: ["Yes, already selected", "No, need suggestions"], recommended: 0, rec: "<strong>Pre-selected brand colors</strong> help us move faster. If not, we recommend a teal/blue palette — it conveys trust, calmness, and professionalism." },
+            { id: "q4", text: "Do you have a design or wireframe ready?", options: ["Yes, have design", "Have basic ideas", "No, need full design"], recommended: 1, rec: "We recommend at least <strong>basic ideas</strong>. Having a rough vision helps us design faster. If nothing is ready, we'll provide design guidelines and mockups." },
+            { id: "q5", text: "What is your target market?", options: ["Local (one country)", "Multiple countries", "Global"], recommended: 0, rec: "<strong>Start local</strong> in one country first. This keeps costs low, lets you test the market, build a user base, and scale globally later." },
+            { id: "q6", text: "Who is your target audience?", options: ["Budget travelers", "Luxury travelers", "Families", "Students", "All types"], multi: true, recommended: [4], rec: "We recommend <strong>All types</strong> to maximize your potential user base from the start. You can always create filtered categories later." },
+            { id: "q7", text: "Should the app support multiple languages?", options: ["English only", "Multi-language"], recommended: 0, rec: "<strong>English only</strong> for MVP. Adding multi-language increases development time and cost significantly. Add it later when expanding." },
+            { id: "q8", text: "Which currencies should be supported?", options: ["Single currency (USD)", "Multiple currencies"], recommended: 0, rec: "<strong>Single currency (USD)</strong> for MVP. Multi-currency requires exchange rate APIs and adds complexity." }
+        ]
+    },
+    {
+        section: "Business Model",
+        icon: "2",
+        questions: [
+            { id: "q9", text: "Who will the 1% service fee be charged to?", options: ["Host", "Guest", "Split between both"], recommended: 1, rec: "We recommend charging the <strong>Guest</strong>. This keeps hosting free, attracts more hosts, and guests generally accept small fees." },
+            { id: "q10", text: "When should payments be released to hosts?", options: ["Before check-in", "After check-in", "24 hours after check-in"], recommended: 2, rec: "<strong>24 hours after check-in</strong> provides the best balance — protects guests from scams, gives hosts confidence, and allows time to report issues." },
+            { id: "q11", text: "What cancellation policy do you prefer?", options: ["Flexible (full refund up to 24h)", "Moderate (refund up to 5 days)", "Strict (50% refund up to 7 days)", "Let host choose"], recommended: 3, rec: "<strong>Let host choose</strong>. This gives hosts control and is the industry standard. It also attracts a wider range of hosts." },
+            { id: "q12", text: "How should refunds be processed?", options: ["Automatic", "Admin approval required"], recommended: 0, rec: "<strong>Automatic refunds</strong> improve user trust and reduce admin workload. Admin can still override in disputes." },
+            { id: "q13", text: "What types of rentals will you support?", options: ["Short-term only", "Long-term only", "Both short and long-term"], recommended: 2, rec: "<strong>Both</strong> gives maximum flexibility. Short-term for travelers, long-term for relocators and digital nomads." },
+            { id: "q14", text: "Is there a minimum or maximum stay requirement?", options: ["No limits", "Minimum 1 night", "Let host decide"], recommended: 2, rec: "<strong>Let host decide</strong>. Hosts know their property best and can set requirements that suit their situation." }
+        ]
+    },
+    {
+        section: "Host Features",
+        icon: "3",
+        questions: [
+            { id: "q15", text: "Should host verification be required?", options: ["Required", "Optional"], recommended: 0, rec: "<strong>Required verification</strong> builds trust — the #1 success factor. Verified hosts make guests feel safer." },
+            { id: "q16", text: "Should ID verification be mandatory?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. ID verification prevents fraud, fake listings, and scams. Stripe Identity makes this easy to implement." },
+            { id: "q17", text: "What property types should be allowed?", options: ["Apartment", "Villa", "Room", "Hotel", "All types"], multi: true, recommended: [4], rec: "<strong>All types</strong>. More variety means more listings, which attracts more guests." },
+            { id: "q18", text: "Can hosts list multiple properties?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Professional hosts often have multiple listings, increasing your platform's supply." },
+            { id: "q19", text: "Should the calendar sync with other platforms?", options: ["Manual only", "Airbnb sync (iCal)", "Multiple platform sync"], recommended: 1, rec: "<strong>Airbnb sync (iCal)</strong> for MVP. Hosts can avoid double-bookings and onboarding is easier." },
+            { id: "q20", text: "Should AI pricing suggestions be included?", options: ["Yes", "No, not for MVP"], recommended: 1, rec: "<strong>Not for MVP</strong>. AI pricing requires market data and ML models. Launch simple, add it later." },
+            { id: "q21", text: "How should hosts withdraw their earnings?", options: ["Bank transfer only", "Stripe only", "PayPal only", "Multiple options"], recommended: 3, rec: "<strong>Multiple options</strong> (Bank + Stripe + PayPal). Stripe Connect handles most of this out of the box." },
+            { id: "q22", text: "Should there be a host dashboard with analytics?", options: ["Yes, with full analytics", "Basic stats only", "No"], recommended: 1, rec: "<strong>Basic stats</strong> for MVP (earnings, bookings, views). Full analytics can be added later." }
+        ]
+    },
+    {
+        section: "Guest Features",
+        icon: "4",
+        questions: [
+            { id: "q23", text: "What login options should be available?", options: ["Email only", "Email + Google", "Email + Google + Apple", "All social logins"], recommended: 2, rec: "<strong>Email + Google + Apple</strong>. Covers 95% of users. Apple Sign-In is required for iOS App Store." },
+            { id: "q24", text: "What type of property search should be available?", options: ["List view only", "Map view only", "Both list and map"], recommended: 2, rec: "<strong>Both</strong>. List view for browsing, map view for location search. Users expect both options." },
+            { id: "q25", text: "What search filters should be included?", options: ["Price only", "Price + Location", "Price + Location + Rating + Amenities", "Advanced (all filters)"], recommended: 2, rec: "<strong>Price + Location + Rating + Amenities</strong> covers what 90% of users need." },
+            { id: "q26", text: "What booking type do you prefer?", options: ["Instant booking", "Request to book", "Both (host chooses)"], recommended: 2, rec: "<strong>Both (host chooses)</strong>. Giving the choice attracts all types of hosts." },
+            { id: "q27", text: "Should there be a wishlist feature?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Wishlists increase engagement and help convert browsers into bookers." },
+            { id: "q28", text: "Should guests see their booking history?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Essential for re-booking and user trust. Every booking platform needs this." }
+        ]
+    },
+    {
+        section: "Cheapest Stay Comparison",
+        icon: "5",
+        questions: [
+            { id: "q29", text: "What should the price comparison cover?", options: ["Within CasaLink only", "Compare with other platforms", "Both"], recommended: 0, rec: "<strong>Within CasaLink only</strong>. Scraping other platforms is legally risky. Compare your own listings — it's safe and adds value." },
+            { id: "q30", text: "Should price comparison be real-time?", options: ["Yes, real-time", "No, periodic updates"], recommended: 1, rec: "<strong>Periodic updates</strong> for MVP. Real-time requires constant processing and increases costs." },
+            { id: "q31", text: "Should users receive price drop alerts?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Price alerts drive engagement and bring users back. Great for retention." },
+            { id: "q32", text: "Should AI recommend the best deals?", options: ["Yes", "No, not for MVP"], recommended: 1, rec: "<strong>Not for MVP</strong>. Simple sorting by price achieves 80% of the same result. Add AI later." }
+        ]
+    },
+    {
+        section: "Reviews & Trust",
+        icon: "6",
+        questions: [
+            { id: "q33", text: "Can guests leave reviews only after a stay?", options: ["Yes, after stay only", "Anytime"], recommended: 0, rec: "<strong>After stay only</strong>. Ensures authentic reviews from real guests." },
+            { id: "q34", text: "Can hosts rate guests?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Two-way reviews build mutual accountability." },
+            { id: "q35", text: "Should there be a verified badge system?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Verified badges signal trustworthiness and increase booking rates." }
+        ]
+    },
+    {
+        section: "Messaging System",
+        icon: "7",
+        questions: [
+            { id: "q36", text: "Should messaging be real-time?", options: ["Yes, real-time chat", "No, basic messaging"], recommended: 0, rec: "<strong>Real-time chat</strong>. Quick communication reduces booking abandonment." },
+            { id: "q37", text: "Should file/image sharing be allowed in chat?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Guests often need to share check-in details or ask about property features." },
+            { id: "q38", text: "Should push notifications be included?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Critical for bookings, messages, and payment updates." }
+        ]
+    },
+    {
+        section: "Admin Panel",
+        icon: "8",
+        questions: [
+            { id: "q39", text: "Should listings require admin approval?", options: ["Yes, admin approval", "No, auto-publish"], recommended: 0, rec: "<strong>Admin approval</strong>. Prevents fake listings and maintains quality." },
+            { id: "q40", text: "Should admin control commission rates?", options: ["Yes", "No, fixed 1%"], recommended: 0, rec: "<strong>Yes</strong>. Flexibility for promotions, different regions, or future model changes." },
+            { id: "q41", text: "Should admin be able to ban users?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Essential for platform safety and removing bad actors." },
+            { id: "q42", text: "What level of admin analytics?", options: ["Basic (revenue, users)", "Advanced (full dashboard)", "No analytics"], recommended: 0, rec: "<strong>Basic analytics</strong> for MVP — revenue, users, bookings, active listings." },
+            { id: "q43", text: "Should there be a report/complaint system?", options: ["Yes", "No"], recommended: 0, rec: "<strong>Yes</strong>. Lets users flag problems. Essential for trust and legal protection." }
+        ]
+    }
+];
+
+const answers = {};
+let currentStep = 0;
+let totalQuestions = 0;
+
+function init() {
+    questionnaire.forEach(s => totalQuestions += s.questions.length);
+    buildStepIndicator();
+    buildSections();
+    showStep(0);
+    updateProgress();
+}
+
+function buildStepIndicator() {
+    const bar = document.getElementById('stepIndicator');
+    questionnaire.forEach((section, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'step-dot';
+        dot.id = `step-${i}`;
+        dot.onclick = () => goToStep(i);
+        dot.innerHTML = `${SECTION_ICONS[i]}<span class="step-dot-label">${section.section}</span>`;
+        bar.appendChild(dot);
+    });
+}
+
+function buildSections() {
+    const container = document.getElementById('formContainer');
+    let qNum = 0;
+
+    questionnaire.forEach((section, sIdx) => {
+        const div = document.createElement('div');
+        div.className = 'wizard-section';
+        div.id = `section-${sIdx}`;
+
+        let html = `<div class="section-header">
+            <div class="section-icon-wrap">${SECTION_ICONS[sIdx]}</div>
+            <div class="section-header-text">
+                <h2>${section.section}</h2>
+                <p>${SECTION_DESCRIPTIONS[sIdx]}</p>
+            </div>
+            <button class="section-auto-btn" onclick="autoSelectRecommended(${sIdx})">
+                Auto-select recommended
+            </button>
+        </div>`;
+
+        section.questions.forEach(q => {
+            qNum++;
+            html += `<div class="question-card" id="card-${q.id}">
+                <div class="question-top">
+                    <span class="question-number">${qNum}</span>
+                    <span class="question-text">${q.text}</span>
+                </div>`;
+
+            if (q.type === 'text') {
+                html += `<input type="text" class="text-input" id="input-${q.id}"
+                    placeholder="${q.placeholder || ''}"
+                    oninput="handleTextInput('${q.id}', this.value)">`;
+            } else {
+                if (q.multi) html += `<div class="multi-note">You can select multiple options</div>`;
+                html += `<div class="options" id="options-${q.id}">`;
+                q.options.forEach((opt, idx) => {
+                    const isRec = q.multi ? (q.recommended && q.recommended.includes(idx)) : idx === q.recommended;
+                    html += `<button class="option-btn${isRec ? ' recommended' : ''}"
+                        onclick="handleSelect('${q.id}', ${idx}, ${!!q.multi})" data-idx="${idx}">
+                        ${opt}${isRec ? '<span class="rec-badge">Recommended</span>' : ''}
+                    </button>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<button class="rec-toggle" onclick="toggleRec(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                Our recommendation
+            </button>
+            <div class="recommendation-box">${q.rec}</div>
+            </div>`;
+        });
+
+        // Navigation buttons (desktop)
+        html += `<div class="nav-buttons">`;
+        if (sIdx > 0) {
+            html += `<button class="nav-btn nav-btn-back" onclick="navigate(-1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Back
+            </button>`;
+        } else {
+            html += `<div class="nav-spacer"></div>`;
+        }
+        if (sIdx < questionnaire.length - 1) {
+            html += `<button class="nav-btn nav-btn-next" onclick="navigate(1)">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>`;
+        } else {
+            html += `<button class="nav-btn nav-btn-next nav-btn-finish" onclick="finishWizard()">
+                Review Answers
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>`;
+        }
+        html += `</div>`;
+
+        div.innerHTML = html;
+        container.appendChild(div);
+    });
+
+    // Completion screen (hidden until finish)
+    const completionDiv = document.createElement('div');
+    completionDiv.className = 'wizard-section';
+    completionDiv.id = 'section-complete';
+    completionDiv.innerHTML = `
+        <div class="completion-screen">
+            <div class="completion-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2>All Done!</h2>
+            <p>You've completed the CasaLink questionnaire. Review your answers below.</p>
+            <button class="completion-btn" onclick="showSummary()">
+                View Summary
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>`;
+    container.appendChild(completionDiv);
+}
+
+function showStep(idx) {
+    document.querySelectorAll('.wizard-section').forEach(s => {
+        s.classList.remove('active');
+        s.classList.remove('exiting');
+    });
+    const target = idx === 'complete'
+        ? document.getElementById('section-complete')
+        : document.getElementById(`section-${idx}`);
+    if (target) {
+        target.classList.add('active');
+        // Re-trigger entrance animations
+        target.querySelectorAll('.question-card').forEach(card => {
+            card.style.animation = 'none';
+            card.offsetHeight; // reflow
+            card.style.animation = '';
+        });
+    }
+    updateStepIndicator(idx);
+    updateMobileNav(idx);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToStep(idx) {
+    const old = document.getElementById(`section-${currentStep}`);
+    if (old && old.classList.contains('active')) {
+        old.classList.add('exiting');
+        old.classList.remove('active');
+        setTimeout(() => {
+            old.classList.remove('exiting');
+            currentStep = idx;
+            showStep(idx);
+        }, 280);
+    } else {
+        currentStep = idx;
+        showStep(idx);
+    }
+}
+
+function navigate(dir) {
+    const next = currentStep + dir;
+    if (next < 0 || next >= questionnaire.length) return;
+    goToStep(next);
+}
+
+function finishWizard() {
+    const old = document.getElementById(`section-${currentStep}`);
+    if (old) {
+        old.classList.add('exiting');
+        old.classList.remove('active');
+    }
+    setTimeout(() => {
+        if (old) old.classList.remove('exiting');
+        currentStep = 'complete';
+        showStep('complete');
+        launchConfetti();
+    }, 280);
+}
+
+function updateStepIndicator(activeIdx) {
+    questionnaire.forEach((_, i) => {
+        const dot = document.getElementById(`step-${i}`);
+        dot.classList.remove('active', 'completed');
+        if (i === activeIdx) {
+            dot.classList.add('active');
+        } else if (isSectionComplete(i)) {
+            dot.classList.add('completed');
+        }
+    });
+    // Scroll active step into view
+    const activeDot = document.getElementById(`step-${activeIdx}`);
+    if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
+function updateMobileNav(idx) {
+    const back = document.getElementById('mobileBack');
+    const next = document.getElementById('mobileNext');
+    if (idx === 'complete' || idx === 0) {
+        back.style.visibility = 'hidden';
+    } else {
+        back.style.visibility = 'visible';
+    }
+    if (idx === 'complete') {
+        next.innerHTML = `Review <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>`;
+        next.className = 'nav-btn nav-btn-next nav-btn-finish';
+        next.onclick = () => showSummary();
+    } else if (idx === questionnaire.length - 1) {
+        next.innerHTML = `Finish <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>`;
+        next.className = 'nav-btn nav-btn-next nav-btn-finish';
+        next.onclick = () => finishWizard();
+    } else {
+        next.innerHTML = `Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>`;
+        next.className = 'nav-btn nav-btn-next';
+        next.onclick = () => navigate(1);
+    }
+}
+
+function isSectionComplete(sIdx) {
+    return questionnaire[sIdx].questions.every(q => answers[q.id] !== undefined);
+}
+
+function handleSelect(qId, idx, multi) {
+    const container = document.getElementById(`options-${qId}`);
+    const buttons = container.querySelectorAll('.option-btn');
+
+    if (multi) {
+        buttons[idx].classList.toggle('selected');
+        const selected = [];
+        buttons.forEach((btn, i) => { if (btn.classList.contains('selected')) selected.push(i); });
+        if (selected.length > 0) answers[qId] = selected;
+        else delete answers[qId];
+    } else {
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        buttons[idx].classList.add('selected');
+        answers[qId] = idx;
+    }
+
+    const card = document.getElementById(`card-${qId}`);
+    card.classList.toggle('answered', answers[qId] !== undefined);
+    updateProgress();
+}
+
+function handleTextInput(qId, value) {
+    if (value.trim()) answers[qId] = value.trim();
+    else delete answers[qId];
+    const card = document.getElementById(`card-${qId}`);
+    card.classList.toggle('answered', !!value.trim());
+    updateProgress();
+}
+
+function autoSelectRecommended(sIdx) {
+    const section = questionnaire[sIdx];
+    section.questions.forEach(q => {
+        if (q.type === 'text') return;
+        if (q.multi && q.recommended) {
+            q.recommended.forEach(idx => {
+                const container = document.getElementById(`options-${q.id}`);
+                const btns = container.querySelectorAll('.option-btn');
+                if (!btns[idx].classList.contains('selected')) {
+                    btns[idx].classList.add('selected');
+                }
+            });
+            answers[q.id] = [...q.recommended];
+        } else if (q.recommended !== undefined) {
+            const container = document.getElementById(`options-${q.id}`);
+            const btns = container.querySelectorAll('.option-btn');
+            btns.forEach(btn => btn.classList.remove('selected'));
+            btns[q.recommended].classList.add('selected');
+            answers[q.id] = q.recommended;
+        }
+        const card = document.getElementById(`card-${q.id}`);
+        card.classList.add('answered');
+    });
+    updateProgress();
+    showToast('Recommended options selected!');
+}
+
+function toggleRec(btn) {
+    btn.classList.toggle('open');
+    const box = btn.nextElementSibling;
+    box.classList.toggle('open');
+}
+
+function updateProgress() {
+    const count = Object.keys(answers).length;
+    const pct = Math.round((count / totalQuestions) * 100);
+    // Circular progress
+    const circumference = 2 * Math.PI * 26; // r=26
+    const offset = circumference - (pct / 100) * circumference;
+    document.getElementById('progressRing').style.strokeDashoffset = offset;
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressCount').textContent = `${count} of ${totalQuestions}`;
+    // Update step indicator completion states
+    updateStepIndicator(currentStep);
+}
+
+function getQuestionData(qId) {
+    for (const section of questionnaire) {
+        for (const q of section.questions) {
+            if (q.id === qId) return q;
+        }
+    }
+    return null;
+}
+
+function getAnswerText(qId) {
+    const q = getQuestionData(qId);
+    if (!q) return '';
+    const ans = answers[qId];
+    if (ans === undefined) return 'Not answered';
+    if (q.type === 'text') return ans;
+    if (Array.isArray(ans)) return ans.map(i => q.options[i]).join(', ');
+    return q.options[ans];
+}
+
+function showSummary() {
+    const overlay = document.getElementById('summaryOverlay');
+    const box = document.getElementById('summaryBox');
+
+    let bodyHtml = '';
+    let qNum = 0;
+    let plainText = 'CASALINK — PROJECT DISCOVERY ANSWERS\n' + '='.repeat(45) + '\n\n';
+
+    questionnaire.forEach(section => {
+        bodyHtml += `<div class="summary-section-card">
+            <div class="summary-section-title">${section.section}</div>`;
+        plainText += `\n${section.section.toUpperCase()}\n${'-'.repeat(30)}\n`;
+
+        section.questions.forEach(q => {
+            qNum++;
+            const ansText = getAnswerText(q.id);
+            const isSkipped = ansText === 'Not answered';
+            bodyHtml += `<div class="summary-item">
+                <span class="summary-q">${qNum}. ${q.text}</span>
+                <span class="summary-a${isSkipped ? ' skipped' : ''}">${ansText}</span>
+            </div>`;
+            plainText += `${qNum}. ${q.text}\n   → ${ansText}\n\n`;
+        });
+        bodyHtml += `</div>`;
+    });
+
+    box.innerHTML = `
+        <div class="summary-header">
+            <h2>CasaLink — Your Selections</h2>
+            <p>${Object.keys(answers).length} of ${totalQuestions} questions answered</p>
+        </div>
+        <div class="summary-body">${bodyHtml}</div>
+        <div class="summary-actions">
+            <button class="btn-copy" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="btn-download" onclick="downloadText()">Download as Text</button>
+            <button class="btn-close-summary" onclick="closeSummary()">Go Back & Edit</button>
+        </div>`;
+    box.dataset.plain = plainText;
+    overlay.classList.add('active');
+}
+
+function closeSummary() {
+    document.getElementById('summaryOverlay').classList.remove('active');
+}
+
+function copyToClipboard() {
+    const text = document.getElementById('summaryBox').dataset.plain;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard!');
+    });
+}
+
+function downloadText() {
+    const text = document.getElementById('summaryBox').dataset.plain;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'CasaLink-Project-Answers.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#0d7377', '#14919b', '#06d6a0', '#ffd166', '#ef476f', '#118ab2'];
+    for (let i = 0; i < 80; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 1.5 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 4500);
+}
+
+// Close summary on overlay click
+document.getElementById('summaryOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeSummary();
+});
+
+init();
+</script>
+
+</body>
+</html>
